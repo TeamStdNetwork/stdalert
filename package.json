@@ -1,0 +1,11 @@
+{
+  "name": "stdalert-demo",
+  "version": "1.0.0",
+  "description": "Demo application for STD Alert",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.4.0",
+    "dotenv": "^16.0.3"
+  }
+}

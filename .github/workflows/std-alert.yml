@@ -1,0 +1,26 @@
+name: 🛡️ STD Alert Scan & Auto-PR
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs automatically every midnight UTC
+  workflow_dispatch:     # Trigger on-demand anytime with 1 click
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  security-and-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run STD Alert Bot
+        uses: TeamStdNetwork/std-alert@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          auto_merge: 'false'
+          fail_on_critical: 'false'

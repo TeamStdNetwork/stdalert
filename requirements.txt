@@ -1,0 +1,5 @@
+# Sample dependencies for testing STD Alert
+fastapi==0.100.0
+pydantic==2.5.0
+httpx==0.24.0
+requests==2.28.1
