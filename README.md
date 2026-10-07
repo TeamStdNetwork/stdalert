@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: TeamStdNetwork/std-alert@main
+      - uses: TeamStdNetwork/stdalert@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 ```

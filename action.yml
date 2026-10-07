@@ -1,0 +1,44 @@
+name: 'STD Alert'
+description: 'Intelligent dependency updates, OSV.dev vulnerability scanning, secret leak detection, and automated PRs'
+author: 'TeamStdNetwork'
+
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  github_token:
+    description: 'GitHub token with contents:write and pull-requests:write permissions'
+    required: false
+    default: ${{ github.token }}
+  auto_merge:
+    description: 'Automatically merge safe patch updates'
+    required: false
+    default: 'false'
+  fail_on_critical:
+    description: 'Fail the action if critical vulnerabilities or secret leaks are found'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install STD Alert dependencies
+      shell: bash
+      run: |
+        pip install --no-cache-dir -r ${{ github.action_path }}/requirements.txt
+
+    - name: Run STD Alert Scan & Auto-PR
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        INPUT_AUTO_MERGE: ${{ inputs.auto_merge }}
+        INPUT_FAIL_ON_CRITICAL: ${{ inputs.fail_on_critical }}
+        PYTHONPATH: ${{ github.action_path }}
+      run: |
+        python ${{ github.action_path }}/cli_runner.py

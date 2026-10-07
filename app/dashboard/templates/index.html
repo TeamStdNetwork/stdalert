@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STD Alert Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --hover-bg: #21262d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-title {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .repo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .repo-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .repo-card:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .repo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .repo-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-blue);
+            cursor: pointer;
+        }
+
+        .repo-meta {
+            display: flex;
+            gap: 15px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-A\+ { background-color: rgba(63, 185, 80, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .badge-A { background-color: rgba(63, 185, 80, 0.1); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .badge-B { background-color: rgba(210, 153, 34, 0.2); color: var(--accent-yellow); border: 1px solid var(--accent-yellow); }
+        .badge-C { background-color: rgba(210, 153, 34, 0.1); color: var(--accent-yellow); border: 1px solid var(--accent-yellow); }
+        .badge-D { background-color: rgba(248, 81, 73, 0.1); color: var(--accent-red); border: 1px solid var(--accent-red); }
+        .badge-F { background-color: rgba(248, 81, 73, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+        .btn {
+            background-color: #21262d;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #30363d;
+            border-color: #8b949e;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ STD Alert Dashboard</h1>
+            <div style="font-size: 14px; color: var(--text-secondary);">Auto-refresh: 60s</div>
+        </header>
+
+        <div class="stats-grid" id="stats-container">
+            <!-- Stats will be loaded here -->
+        </div>
+
+        <div class="repo-list" id="repos-container">
+            <div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchStats() {
+            try {
+                const response = await fetch('/dashboard/api/stats');
+                const stats = await response.json();
+                
+                document.getElementById('stats-container').innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-title">Total Repos Monitored</div>
+                        <div class="stat-value">${stats.total_repos_monitored}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Total Scans Run</div>
+                        <div class="stat-value">${stats.total_scans_run}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">PRs Created</div>
+                        <div class="stat-value">${stats.total_prs_created}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Vulnerabilities Found</div>
+                        <div class="stat-value">${stats.total_vulnerabilities_found}</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        async function fetchRepos() {
+            try {
+                const response = await fetch('/dashboard/api/repos');
+                const repos = await response.json();
+                
+                const container = document.getElementById('repos-container');
+                container.innerHTML = '';
+                
+                if (repos.length === 0) {
+                    container.innerHTML = '<div class="repo-card" style="text-align:center;">No repositories monitored yet.</div>';
+                    return;
+                }
+
+                repos.forEach(repoData => {
+                    const repo = repoData.repo;
+                    const health = repoData.health;
+                    const latest = repoData.latest_scan;
+                    
+                    const outdatedCount = (latest.dependencies || []).filter(d => d.outdated).length;
+                    const vulnCount = (latest.vulnerabilities || []).length;
+                    
+                    const timeStr = new Date(latest.timestamp).toLocaleString();
+                    const [owner, repoName] = repo.split('/');
+
+                    const card = document.createElement('div');
+                    card.className = 'repo-card';
+                    card.innerHTML = `
+                        <div class="repo-header">
+                            <div class="repo-name">${repo}</div>
+                            <button class="btn" onclick="triggerScan('${owner}', '${repoName}')">Run Scan</button>
+                        </div>
+                        <div class="repo-meta">
+                            <span class="badge badge-${health.grade.replace('+', '\\+')}">${health.grade} (${health.total_score}/100)</span>
+                            <span>Last scan: ${timeStr}</span>
+                            <span><span style="color:var(--accent-yellow)">${outdatedCount}</span> outdated deps</span>
+                            <span><span style="color:var(--accent-red)">${vulnCount}</span> vulns</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error fetching repos:', error);
+                document.getElementById('repos-container').innerHTML = '<div class="repo-card" style="color:var(--accent-red)">Error loading repositories.</div>';
+            }
+        }
+
+        async function triggerScan(owner, repo) {
+            try {
+                const response = await fetch(`/dashboard/api/repos/${owner}/${repo}/scan`, { method: 'POST' });
+                const result = await response.json();
+                alert(result.message);
+                fetchRepos(); // refresh
+            } catch (error) {
+                console.error('Error triggering scan:', error);
+                alert('Failed to trigger scan.');
+            }
+        }
+
+        function refreshAll() {
+            fetchStats();
+            fetchRepos();
+        }
+
+        // Initial load
+        refreshAll();
+
+        // Auto refresh every 60 seconds
+        setInterval(refreshAll, 60000);
+    </script>
+</body>
+</html>

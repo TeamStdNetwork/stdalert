@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run STD Alert Bot
-        uses: TeamStdNetwork/std-alert@main
+        uses: TeamStdNetwork/stdalert@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           auto_merge: 'false'

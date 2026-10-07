@@ -1,0 +1,22 @@
+{
+  "name": "STD Alert",
+  "url": "https://github.com/apps/std-alert",
+  "hook_attributes": {
+    "url": "https://your-server.com/webhook/github",
+    "active": true
+  },
+  "redirect_url": "https://your-server.com/callback",
+  "setup_url": "https://your-server.com/setup",
+  "description": "Intelligent dependency monitoring, security scanning, and automated updates for your repositories.",
+  "public": true,
+  "default_events": ["push", "pull_request", "installation", "installation_repositories", "issues", "create", "delete"],
+  "default_permissions": {
+    "contents": "write",
+    "pull_requests": "write",
+    "issues": "write",
+    "checks": "read",
+    "statuses": "read",
+    "metadata": "read",
+    "actions": "read"
+  }
+}
